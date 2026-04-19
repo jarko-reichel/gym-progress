@@ -115,6 +115,19 @@ export const sk = {
     importHint: 'Načítaj predtým exportovaný JSON súbor.',
     importMerge: 'Zlúčiť',
     importReplace: 'Nahradiť',
+    demo: 'Demo dáta',
+    demoHint:
+      '8 týždňov progresívneho tréningu (Push/Pull/Legs) — ideálne pre prehliadku grafov a rekordov.',
+    loadDemo: 'Načítať demo dáta',
+    demoLoaded: 'Demo dáta načítané: {workouts} tréningov, {sets} sérií, {prs} rekordov.',
+    demoConfirm:
+      'Pridá do databázy ~24 demo tréningov. Pokračovať?',
+    reset: 'Vymazať všetky dáta',
+    resetHint:
+      'Zmaže všetky tréningy, série, rekordy a šablóny. Cviky a nastavenia zostanú.',
+    resetConfirm:
+      'Naozaj vymazať všetky tréningy, série, rekordy a šablóny? Túto operáciu nie je možné vrátiť.',
+    resetDone: 'Dáta boli vymazané.',
   },
   pr: {
     one_rm: '1RM PR',

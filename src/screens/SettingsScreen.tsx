@@ -1,5 +1,5 @@
-import { useRef } from 'react';
-import { Download, Upload, Moon, Sun, Monitor } from 'lucide-react';
+import { useRef, useState } from 'react';
+import { Download, Upload, Moon, Sun, Monitor, Sparkles, Trash2 } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useSettings } from '@/hooks/useSettings';
 import {
@@ -12,6 +12,7 @@ import {
 } from '@/domain/exportImport';
 import { useUiStore } from '@/state/uiStore';
 import { formulaLabel } from '@/domain/oneRm';
+import { clearAllData, loadDemoData } from '@/db/demoData';
 import type { OneRmFormula } from '@/db/schema';
 import { t } from '@/i18n';
 import { cn } from '@/utils/cn';
@@ -20,6 +21,37 @@ export function SettingsScreen() {
   const { settings, update } = useSettings();
   const showToast = useUiStore((s) => s.showToast);
   const fileInput = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState<'demo' | 'reset' | null>(null);
+
+  const handleLoadDemo = async () => {
+    if (!confirm(t('settings.demoConfirm'))) return;
+    setBusy('demo');
+    try {
+      const res = await loadDemoData();
+      const msg = t('settings.demoLoaded')
+        .replace('{workouts}', String(res.workouts))
+        .replace('{sets}', String(res.sets))
+        .replace('{prs}', String(res.prs));
+      showToast(msg, 'success');
+    } catch (e) {
+      showToast(`Demo: ${(e as Error).message}`, 'error');
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const handleReset = async () => {
+    if (!confirm(t('settings.resetConfirm'))) return;
+    setBusy('reset');
+    try {
+      await clearAllData();
+      showToast(t('settings.resetDone'), 'success');
+    } catch (e) {
+      showToast(`Reset: ${(e as Error).message}`, 'error');
+    } finally {
+      setBusy(null);
+    }
+  };
 
   const exportJson = async () => {
     const payload = await buildExport();
@@ -139,6 +171,30 @@ export function SettingsScreen() {
               <Download size={16} /> {t('settings.exportCsv')}
             </button>
           </div>
+        </section>
+
+        <section className="card p-4">
+          <h2 className="mb-1 text-base font-semibold">{t('settings.demo')}</h2>
+          <p className="mb-3 text-xs text-[rgb(var(--text-muted))]">{t('settings.demoHint')}</p>
+          <button onClick={handleLoadDemo} disabled={busy !== null} className="btn-primary">
+            <Sparkles size={16} />
+            {busy === 'demo' ? t('common.loading') : t('settings.loadDemo')}
+          </button>
+        </section>
+
+        <section className="card border-red-300 p-4 dark:border-red-900">
+          <h2 className="mb-1 text-base font-semibold text-red-700 dark:text-red-400">
+            {t('settings.reset')}
+          </h2>
+          <p className="mb-3 text-xs text-[rgb(var(--text-muted))]">{t('settings.resetHint')}</p>
+          <button
+            onClick={handleReset}
+            disabled={busy !== null}
+            className="btn bg-red-600 text-white hover:bg-red-700"
+          >
+            <Trash2 size={16} />
+            {busy === 'reset' ? t('common.loading') : t('settings.reset')}
+          </button>
         </section>
 
         <section className="card p-4">
